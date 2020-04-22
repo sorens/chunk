@@ -40,6 +40,8 @@ output_file = sprintf("chunk-%08d.txt", output_count)
 puts output_file
 FileUtils.mkdir_p @options[:output]
 output = File.expand_path(File.join(@options[:output], output_file))
+total_count = 0
+file_count = 0
 count = 0
 first = true
 header = ""
@@ -56,12 +58,15 @@ File.foreach(input_file).with_index do |line, line_num|
         # create a new file name
         output_count = output_count + 1
         output_file = sprintf("chunk-%08d.txt", output_count)
-        puts output_file
         output = File.expand_path(File.join(@options[:output], output_file))
         size = File.write(output, header, size, mode: "a+")
         File.write(output, header, size, mode: "a+")
+        total_count = total_count + count
         count = 0
+        file_count = file_count + 1
+        puts output_file
     end
 end
 
-puts "total lines: #{count}"
+puts "total lines:          #{total_count}"
+puts "total files created:  #{file_count}"
