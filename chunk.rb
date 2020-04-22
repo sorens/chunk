@@ -43,17 +43,14 @@ output = File.expand_path(File.join(@options[:output], output_file))
 count = 0
 first = true
 header = ""
+size = 0
 File.foreach(input_file).with_index do |line, line_num|
     if first
         header = line
         first = false
     end
     count = count + 1
-    size = 0
-    if File.exists?(output)
-        size = File.size(output)
-    end
-    File.write(output, line, size, mode: "a+")
+    size = size + File.write(output, line, size, mode: "a+")
 
     if count >= @options[:chunk_size]
         # create a new file name
@@ -61,10 +58,7 @@ File.foreach(input_file).with_index do |line, line_num|
         output_file = sprintf("chunk-%08d.txt", output_count)
         puts output_file
         output = File.expand_path(File.join(@options[:output], output_file))
-        size = 0
-        if File.exists?(output)
-            size = File.size(output)
-        end
+        size = File.write(output, header, size, mode: "a+")
         File.write(output, header, size, mode: "a+")
         count = 0
     end
