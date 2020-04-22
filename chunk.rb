@@ -20,6 +20,9 @@ op = OptionParser.new do |opts|
     opts.on("-c", "--chunk_size [NO_OF_LINES]", "how many lines should be in each chunk") do |chunk_size|
         @options[:chunk_size] = chunk_size.to_i
     end
+    opts.on("-h", "--header", "") do |header|
+        @options[:header] = header
+    end
 end
 
 begin
@@ -47,7 +50,7 @@ first = true
 header = ""
 size = 0
 File.foreach(input_file).with_index do |line, line_num|
-    if first
+    if first and @options[:header]
         header = line
         first = false
     end
@@ -59,8 +62,9 @@ File.foreach(input_file).with_index do |line, line_num|
         output_count = output_count + 1
         output_file = sprintf("chunk-%08d.txt", output_count)
         output = File.expand_path(File.join(@options[:output], output_file))
-        size = File.write(output, header, size, mode: "a+")
-        File.write(output, header, size, mode: "a+")
+        if @options[:header] and header != ""
+            size = File.write(output, header, size, mode: "a+")
+        end
         total_count = total_count + count
         count = 0
         file_count = file_count + 1
